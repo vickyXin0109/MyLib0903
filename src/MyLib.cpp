@@ -37,38 +37,37 @@ namespace hardware{
 
     void CanControl::EnableMotros()
     {
-        SetMotorsCmd(ENABLE_MOTOR);
+        SetCMDs(ENABLE_MOTOR);
     }
 
     void CanControl::DisableMotors()
     {
         //失能同一总线上的所有关节
         //Disable all motors on the can bus
-        SetMotorsCmd(DISABLE_MOTOR);
+        SetCMDs(DISABLE_MOTOR);
     }
 
     void CanControl::GetStatus()
     {
-        SetMotorsCmd(GET_STATUS_WORD);
+        SetCMDs(GET_STATUS_WORD);
     }
 
     void CanControl::SetMotorsHome()
     {
-        SetMotorsCmd(SET_HOME);
+        SetCMDs(SET_HOME);
         printf("[INFO] datas are sended\r\n");
     }
 
-    void CanControl::SendRecvMotorsData()
+    void CanControl::SendMotorsCMD()
     {
-        SetMotorsCmd(CONTROL_MOTOR);
+        SetCMDs(CONTROL_MOTOR);
         printf("[INFO] datas are sended\r\n");
     }
 
-    void CanControl::SetMotorsCmd(int function)
+    void CanControl::SetCMDs(int function)
     {
         for(int i = 0; i < MOTOR_NUMBER; i++)
         {
-            int ret = 0;
             int motor_id = i+1;
             if (function == CONTROL_MOTOR) 
             {
@@ -79,14 +78,26 @@ namespace hardware{
                 SetNormalCMD(motorsCmd[i], motor_id, function);
             }
 
-            ret = SendRecv(can, motorsCmd[i], motor_data);
-            RecvMotorData();
-            CheckSendRecvError(motor_id, ret);
-            CheckMotorError(motor_id, motor_data->error_);
+            motorsData[i]->send_error_ = SendMsg(can, motorsCmd[i]);
+            DisDatas();
+            CheckSendRecvError(motor_id, motorsData[i]->send_error_);//just for print
         }
     }
 
-    void CanControl::RecvMotorData()
+    void CanControl::RecvMotorsDATA()
+    {
+        for(int i = 0; i < MOTOR_NUMBER; i++)
+        {
+            int motor_id = i+1;
+            motor_data->recv_error_ = RecvMsg(can, motor_data);
+            CheckSendRecvError(motor_id, motor_data->recv_error_);//just for print
+            CheckMotorError(motor_id, motor_data->error_);//just for print
+            DisDatas();
+        }
+        
+    }
+
+    void CanControl::DisDatas()
     {
         uint8_t motor_id_fb = motor_data->motor_id_;
         uint8_t motor_data_arry = motor_id_fb - 1;
@@ -100,6 +111,34 @@ namespace hardware{
 		{
             motorsData[motor_data_arry] = motor_data;
 		}
+
+    }
+
+    int CanControl:: Safety_PositionProtect()
+    {
+        if (motorsCmd[FR_0]->position_ > HIP_MAX || motorsCmd[FR_0]->position_ < HIP_MIN)
+        {
+            printf("[WARN] FR_0 Motor out of soft-limit /n");
+            return -1;
+        }
+
+        else if (motorsCmd[FR_1]->position_ > THIGH_MAX || motorsCmd[FR_1]->position_ < THIGH_MIN)
+        {
+            printf("[WARN] FR_1 Motor out of soft-limit /n");
+            return -1;
+        }
+
+        else if (motorsCmd[FR_2]->position_ > CALF_MAX || motorsCmd[FR_2]->position_ < CALF_MIN)
+        {
+            printf("[WARN] FR_2 Motor out of soft-limit /n");
+            return -1;
+        }
+
+        else
+        {
+            return 0;
+        }
+
 
     }
 }

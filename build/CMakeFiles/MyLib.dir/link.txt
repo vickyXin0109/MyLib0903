@@ -1,2 +1,0 @@
-/usr/bin/ar qc libMyLib.a CMakeFiles/MyLib.dir/home/yuexin/AddLibrary_826/src/MyLib.cpp.o
-/usr/bin/ranlib libMyLib.a

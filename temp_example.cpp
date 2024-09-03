@@ -15,16 +15,15 @@ class Custom
 {
 public:
   
-  void CANSendRecv();
+  int CANSend();
+  void CANRecv();
   void RobotControl();
 
   //Safety safe;
-  Custom() : can_control("can0")
+  Custom() : can_control("can1")
   {}
 
   CanControl can_control;
-  //can_control.motorsCmd = {0};
-  //can_control.motorsData = {0};
 
   float qInit[MOTOR_NUMBER] = {0};
   float qDes[MOTOR_NUMBER] = {0};
@@ -38,9 +37,22 @@ public:
   float dt = 0.002; // 0.001~0.01
 };
 
-void Custom::CANSendRecv()
+int Custom::CANSend()
 {
-  can_control.SendRecvMotorsData();
+  int ret = 0;
+  ret = can_control.Safety_PositionProtect();
+  if (ret == 0 )
+  {
+    can_control.SendMotorsCMD();
+    return 0;
+  }
+  else
+    return -1;
+}
+
+void Custom::CANRecv()
+{
+  can_control.RecvMotorsDATA();
 }
 
 
@@ -55,29 +67,20 @@ double jointLinearInterpolation(double initPos, double targetPos, double rate)
 void Custom::RobotControl()
 {
   motiontime++;
-  //udp.GetRecv(state);
+  can_control.RecvMotorsDATA();
   printf("[io] :motiontime : %d\n", motiontime);
+  printf("[DATA]: p= %f; v= %f; t= %f; temp= %f; error= %d",
+    can_control.motorsData[0]->position_, can_control.motorsData[0]->velocity_, 
+    can_control.motorsData[0]->torque_, can_control.motorsData[0]->temp_, 
+    can_control.motorsData[0]->error_);
 
-  // gravity compensation
   can_control.motorsCmd[FR_0]->torque_ = +1.0f;
-  //can_control.motorsCmd[FL_0].tau = +1.0f;
-  //cmd.motorCmd[RR_0].tau = -0.65f;
-  //cmd.motorCmd[RL_0].tau = +0.65f;
 
-  // if( motiontime >= 100){
   if (motiontime >= 0)
   {
-    // first, get record initial position
-    // if( motiontime >= 100 && motiontime < 500){
     if (motiontime >= 0 && motiontime < 10)
-        can_control.GetStatus();
-    //{
-      //qInit[0] = state.motorState[FR_0].q;
-      //qInit[1] = state.motorState[FR_1].q;
-      //qInit[2] = state.motorState[FR_2].q;
-    //}
-    // second, move to the origin point of a sine movement with Kp Kd
-    // if( motiontime >= 500 && motiontime < 1500){
+        can_control.SetMotorsHome();
+
     if (motiontime >= 10 && motiontime < 400)
     {
       rate_count++;
@@ -138,8 +141,12 @@ int main(void)
         custom.RobotControl();
         if (custom.motiontime >= 10)
         {
-            custom.CANSendRecv();
-            custom.
+            int ret = custom.CANSend();
+            if (ret == -1 )
+            {
+              break;
+            }   
+            custom.CANRecv();       
         }
         
         if (custom.motiontime >500)

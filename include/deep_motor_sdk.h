@@ -15,6 +15,8 @@
 #include "can_protocol.h"
 #include "comm.h"
 
+using namespace hardware;
+
 enum SendRecvRet{
     //*******************************
     //SendRecvRet: SendRecv函数的返回值
@@ -351,7 +353,7 @@ void DrMotorCanDestroy(DrMotorCan *can){
 
 //使用DrMotorCan进行数据的发送和接收
 //Send and receive data via DrMotorCan
-int SendRecv(DrMotorCan *can, const MotorCMD *cmd, MotorDATA *data){
+/*int SendRecv(DrMotorCan *can, const MotorCMD *cmd, MotorDATA *data){
     struct can_frame send_frame, recv_frame;
     MakeSendFrame(cmd, &send_frame);
 
@@ -403,4 +405,70 @@ int SendRecv(DrMotorCan *can, const MotorCMD *cmd, MotorDATA *data){
         ParseRecvFrame(&recv_frame, data);
         return kNoSendRecvError;
     }
+}*/
+int SendMsg(DrMotorCan *can, const MotorCMD *cmd){
+    struct can_frame send_frame;
+    MakeSendFrame(cmd, &send_frame);
+
+    struct timeval start_time;
+    gettimeofday(&start_time, NULL);
+
+    if(can->is_show_log_){
+        printf("[INFO] Writing frame with can_id: %d, can_dlc: %d, data: %d, %d, %d, %d, %d, %d, %d, %d",
+            send_frame.can_id, send_frame.can_dlc,
+            (uint32_t)send_frame.data[0], (uint32_t)send_frame.data[1], (uint32_t)send_frame.data[2], (uint32_t)send_frame.data[3],
+            (uint32_t)send_frame.data[4], (uint32_t)send_frame.data[5], (uint32_t)send_frame.data[6], (uint32_t)send_frame.data[7]
+        );
+    }
+    
+    pthread_mutex_lock(&can->rw_mutex);
+    ssize_t nbytes1 = write(can->can_socket_, &send_frame, sizeof(send_frame));
+    pthread_mutex_unlock(&can->rw_mutex);
+    if(nbytes1 != sizeof(send_frame)){
+        return kSendLengthError;
+    }
+    struct timeval end_time;
+            gettimeofday(&end_time, NULL);
+            long long duration_us = (end_time.tv_sec - start_time.tv_sec) * 1000000LL +
+                        (end_time.tv_usec - start_time.tv_usec);
+            printf("[INFO] Send() t_diff: %lld us\r\n", duration_us);
+    return kNoSendRecvError;
 }
+
+int RecvMsg(DrMotorCan *can, MotorDATA *data){
+    struct can_frame recv_frame;
+    
+    struct timeval start_time;
+    gettimeofday(&start_time, NULL);
+
+    struct epoll_event events;
+    int epoll_wait_result = epoll_wait(can->epoll_fd_, &events, 5, 3);
+    if(epoll_wait_result == 0){
+        return kRecvTimeoutError;
+    }else if (epoll_wait_result == -1){
+        return kRecvEpollError;
+    }else{
+        pthread_mutex_lock(&can->rw_mutex);
+        ssize_t nbytes2 = read(can->can_socket_, &recv_frame, sizeof(recv_frame));
+        pthread_mutex_unlock(&can->rw_mutex);
+        if(nbytes2 != sizeof(recv_frame)){
+            return kRecvLengthError;
+        }
+
+        if(can->is_show_log_){
+            /*printf("[INFO] Reading frame with can_id: %d, can_dlc: %d, data: %d, %d, %d, %d, %d, %d, %d, %d\r\n",
+                recv_frame.can_id, recv_frame.can_dlc,
+                (uint32_t)recv_frame.data[0], (uint32_t)recv_frame.data[1], (uint32_t)recv_frame.data[2], (uint32_t)recv_frame.data[3],
+                (uint32_t)recv_frame.data[4], (uint32_t)recv_frame.data[5], (uint32_t)recv_frame.data[6], (uint32_t)recv_frame.data[7]
+            );*/
+            struct timeval end_time;
+            gettimeofday(&end_time, NULL);
+            long long duration_us = (end_time.tv_sec - start_time.tv_sec) * 1000000LL +
+                        (end_time.tv_usec - start_time.tv_usec);
+            printf("[INFO] Recv() t_diff: %lld us\r\n", duration_us);
+        }
+
+        ParseRecvFrame(&recv_frame, data);
+        return kNoSendRecvError;
+    }
+}   

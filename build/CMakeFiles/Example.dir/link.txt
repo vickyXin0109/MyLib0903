@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/Example.dir/temp_example.cpp.o -o Example   -L/home/yuexin/AddLibrary_826/build  -Wl,-rpath,/home/yuexin/AddLibrary_826/build -lMyLib

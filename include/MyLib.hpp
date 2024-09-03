@@ -7,8 +7,6 @@
 #include "quadruped.h"
 
 
-#define MOTOR_NUMBER 3
-
 namespace hardware{
 
 class CanControl{
@@ -25,18 +23,20 @@ class CanControl{
         void GetStatus();
         //void InitCmdData();
         //void SetSend(MotorCMD *set_cmd);
-        void SendRecvMotorsData();
-        //void Recv();
+        void SendMotorsCMD();
+        void RecvMotorsDATA();
         void SetMotorsHome();
 
         void EnableMotros();
         void DisableMotors();
 
+        int Safety_PositionProtect();
+
     private:
 
         MotorDATA *motor_data;
-        void SetMotorsCmd(int function);
-        void RecvMotorData();
+        void SetCMDs(int function);
+        void DisDatas();
 };
 }
 

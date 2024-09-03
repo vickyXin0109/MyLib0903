@@ -1,3 +1,0 @@
-/home/yuexin/AddLibrary_826/build/CMakeFiles/Example.dir
-/home/yuexin/AddLibrary_826/build/CMakeFiles/edit_cache.dir
-/home/yuexin/AddLibrary_826/build/CMakeFiles/rebuild_cache.dir
