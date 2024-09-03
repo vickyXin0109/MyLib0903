@@ -2,7 +2,6 @@
 #include "MyLib.hpp"
 #include "deep_motor_sdk.h"
 
-//test-1
 using namespace std;
 
 namespace hardware{
