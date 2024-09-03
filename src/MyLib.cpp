@@ -1,4 +1,4 @@
-
+//is new!
 #include "MyLib.hpp"
 #include "deep_motor_sdk.h"
 
@@ -21,19 +21,20 @@ namespace hardware{
         EnableMotros();
     }
     
-    	CanControl::~CanControl()
-	{
-        DisableMotors();
-        //回收资源
-        //Reclaim allocated memory
-        DrMotorCanDestroy(can);
-        for(int i = 0; i < MOTOR_NUMBER; i++)
-        {
-            MotorCMDDestroy(motorsCmd[i]);
-            MotorDATADestroy(motorsData[i]);
+    	CanControl::~CanControl(){
+            DisableMotors();
+
+            //回收资源
+            //Reclaim allocated memory
+            DrMotorCanDestroy(can);
+        
+        
+            for(int i = 0; i < MOTOR_NUMBER; i++)
+            {
+                MotorCMDDestroy(motorsCmd[i]);
+                MotorDATADestroy(motorsData[i]);
+            }
         }
-        printf("[INFO] Ended multi motor control\r\n");
-	}
 
     void CanControl::EnableMotros()
     {
@@ -79,7 +80,7 @@ namespace hardware{
             }
 
             motorsData[i]->send_error_ = SendMsg(can, motorsCmd[i]);
-            DisDatas();
+
             CheckSendRecvError(motor_id, motorsData[i]->send_error_);//just for print
         }
     }
@@ -89,7 +90,9 @@ namespace hardware{
         for(int i = 0; i < MOTOR_NUMBER; i++)
         {
             int motor_id = i+1;
-            motor_data->recv_error_ = RecvMsg(can, motor_data);
+            int err_recv;
+            err_recv = RecvMsg(can, motor_data);
+            motor_data->recv_error_ = err_recv;
             CheckSendRecvError(motor_id, motor_data->recv_error_);//just for print
             CheckMotorError(motor_id, motor_data->error_);//just for print
             DisDatas();
@@ -102,6 +105,7 @@ namespace hardware{
         uint8_t motor_id_fb = motor_data->motor_id_;
         uint8_t motor_data_arry = motor_id_fb - 1;
 		uint8_t cmd = motor_data->cmd_;
+        
         if (motor_data_arry < 0)
         {
             printf("[ERROR]: Motor_Id: %d is wrong!", motor_id_fb);
@@ -109,9 +113,12 @@ namespace hardware{
 
         if (cmd == CONTROL_MOTOR)
 		{
-            motorsData[motor_data_arry] = motor_data;
+            motorsData[motor_data_arry]->position_ = motor_data->position_;
+            motorsData[motor_data_arry]->velocity_ = motor_data->velocity_;
+            motorsData[motor_data_arry]->torque_ = motor_data->torque_;
+            motorsData[motor_data_arry]->temp_ = motor_data->temp_;
+            motorsData[motor_data_arry]->error_ = motor_data->error_;
 		}
-
     }
 
     int CanControl:: Safety_PositionProtect()

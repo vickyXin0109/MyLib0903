@@ -129,6 +129,8 @@ void CheckMotorError(uint8_t motor_id, uint16_t code){
 MotorDATA *MotorDATACreate(){
     MotorDATA *motor_data = (MotorDATA*)malloc(sizeof(MotorDATA));
     motor_data->error_ = kMotorNoError;
+    motor_data->recv_error_ = 0;
+    motor_data->send_error_ = 0;
     return motor_data;
 }
 

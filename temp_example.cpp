@@ -20,14 +20,14 @@ public:
   void RobotControl();
 
   //Safety safe;
-  Custom() : can_control("can1")
+  Custom() : can_control("can0")
   {}
 
   CanControl can_control;
 
   float qInit[MOTOR_NUMBER] = {0};
   float qDes[MOTOR_NUMBER] = {0};
-  float sin_mid_q[MOTOR_NUMBER] = {1.2, 1.2, -2.0};
+  float sin_mid_q[MOTOR_NUMBER] = {0.5, 1.0, -1.5};
   float Kp[MOTOR_NUMBER] = {0};
   float Kd[MOTOR_NUMBER] = {0};
   double time_consume = 0;
@@ -67,12 +67,7 @@ double jointLinearInterpolation(double initPos, double targetPos, double rate)
 void Custom::RobotControl()
 {
   motiontime++;
-  can_control.RecvMotorsDATA();
   printf("[io] :motiontime : %d\n", motiontime);
-  printf("[DATA]: p= %f; v= %f; t= %f; temp= %f; error= %d",
-    can_control.motorsData[0]->position_, can_control.motorsData[0]->velocity_, 
-    can_control.motorsData[0]->torque_, can_control.motorsData[0]->temp_, 
-    can_control.motorsData[0]->error_);
 
   can_control.motorsCmd[FR_0]->torque_ = +1.0f;
 
@@ -144,17 +139,25 @@ int main(void)
             int ret = custom.CANSend();
             if (ret == -1 )
             {
-              break;
+              break; 
             }   
-            custom.CANRecv();       
+            custom.CANRecv();      
+              for (int i = 0; i<MOTOR_NUMBER; i++)
+            {
+            printf("[DATA-recvend]: i= %d; p= %f; v= %f; t= %f; temp= %f; error= %d;\r\n",i,
+              custom.can_control.motorsData[i]->position_, custom.can_control.motorsData[i]->velocity_, 
+              custom.can_control.motorsData[i]->torque_, custom.can_control.motorsData[i]->temp_, 
+              custom.can_control.motorsData[i]->error_);} 
         }
         
         if (custom.motiontime >500)
         {
-            //custom.can_control.DisableMotors();
             break;
         }
+        usleep(600);
     }
+  //  custom.can_control.OverCanControl();
+
 
   return 0;
 }

@@ -5,11 +5,11 @@
 
 #define MOTOR_NUMBER 3
 
-#define HIP_MAX 1.57f
-#define HIP_MIN -1.57f
-#define THIGH_MAX 3.14f
+#define HIP_MAX 1.57f   //ID=1
+#define HIP_MIN -1.57f  
+#define THIGH_MAX 3.14f     //ID=2
 #define THIGH_MIN -3.14f
-#define CALF_MAX 3.14f
+#define CALF_MAX 3.14f  //ID=3
 #define CALF_MIN -3.14f
 
 namespace hardware {
