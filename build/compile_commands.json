@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/yuexin/AddLibrary_826/build",
+  "command": "/usr/bin/c++  -I/home/yuexin/AddLibrary_826/include -g -o CMakeFiles/Example.dir/temp_example.cpp.o -c /home/yuexin/AddLibrary_826/temp_example.cpp",
+  "file": "/home/yuexin/AddLibrary_826/temp_example.cpp",
+  "output": "CMakeFiles/Example.dir/temp_example.cpp.o"
+}
+]

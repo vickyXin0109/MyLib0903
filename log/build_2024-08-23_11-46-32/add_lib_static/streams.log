@@ -1,0 +1,26 @@
+[0.006s] Invoking command in '/home/yuexin/AddLibrary_823/build/add_lib_static': /usr/local/bin/cmake /home/yuexin/AddLibrary_823 -DCMAKE_INSTALL_PREFIX=/home/yuexin/AddLibrary_823/install/add_lib_static
+[0.043s] -- The C compiler identification is GNU 11.4.0
+[0.086s] -- The CXX compiler identification is GNU 11.4.0
+[0.094s] -- Detecting C compiler ABI info
+[0.134s] -- Detecting C compiler ABI info - done
+[0.147s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.147s] -- Detecting C compile features
+[0.147s] -- Detecting C compile features - done
+[0.150s] -- Detecting CXX compiler ABI info
+[0.196s] -- Detecting CXX compiler ABI info - done
+[0.210s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.210s] -- Detecting CXX compile features
+[0.210s] -- Detecting CXX compile features - done
+[0.211s] -- Configuring done (0.2s)
+[0.213s] -- Generating done (0.0s)
+[0.213s] -- Build files have been written to: /home/yuexin/AddLibrary_823/build/add_lib_static
+[0.216s] Invoked command in '/home/yuexin/AddLibrary_823/build/add_lib_static' returned '0': /usr/local/bin/cmake /home/yuexin/AddLibrary_823 -DCMAKE_INSTALL_PREFIX=/home/yuexin/AddLibrary_823/install/add_lib_static
+[0.217s] Invoking command in '/home/yuexin/AddLibrary_823/build/add_lib_static': /usr/local/bin/cmake --build /home/yuexin/AddLibrary_823/build/add_lib_static -- -j8 -l8
+[0.229s] [ 50%] [32mBuilding CXX object CMakeFiles/Example.dir/Example.cpp.o[0m
+[0.250s] [100%] [32m[1mLinking CXX executable Example[0m
+[0.254s] /usr/bin/ld: 找不到 -lMyLib: 没有那个文件或目录
+[0.269s] collect2: error: ld returned 1 exit status
+[0.270s] gmake[2]: *** [CMakeFiles/Example.dir/build.make:97：Example] 错误 1
+[0.270s] gmake[1]: *** [CMakeFiles/Makefile2:83：CMakeFiles/Example.dir/all] 错误 2
+[0.270s] gmake: *** [Makefile:91：all] 错误 2
+[0.271s] Invoked command in '/home/yuexin/AddLibrary_823/build/add_lib_static' returned '2': /usr/local/bin/cmake --build /home/yuexin/AddLibrary_823/build/add_lib_static -- -j8 -l8

@@ -1,0 +1,4 @@
+Invoking command in '/home/yuexin/AddLibrary_823/build/add_lib_static': /usr/local/bin/cmake /home/yuexin/AddLibrary_823 -DCMAKE_INSTALL_PREFIX=/home/yuexin/AddLibrary_823/install/add_lib_static
+Invoked command in '/home/yuexin/AddLibrary_823/build/add_lib_static' returned '0': /usr/local/bin/cmake /home/yuexin/AddLibrary_823 -DCMAKE_INSTALL_PREFIX=/home/yuexin/AddLibrary_823/install/add_lib_static
+Invoking command in '/home/yuexin/AddLibrary_823/build/add_lib_static': /usr/local/bin/cmake --build /home/yuexin/AddLibrary_823/build/add_lib_static -- -j8 -l8
+Invoked command in '/home/yuexin/AddLibrary_823/build/add_lib_static' returned '2': /usr/local/bin/cmake --build /home/yuexin/AddLibrary_823/build/add_lib_static -- -j8 -l8
